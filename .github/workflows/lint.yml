@@ -19,10 +19,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-      - name: 安装 pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: 启用 pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
       
       - name: 安装依赖
         run: pnpm install
