@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
       
       - name: 安装依赖
-        run: npm ci
+        run: pnpm install
       
       - name: 运行 ESLint 检查
-        run: npm run lint
+        run: pnpm run lint
