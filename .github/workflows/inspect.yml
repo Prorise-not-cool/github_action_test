@@ -1,0 +1,26 @@
+name: Inspect Runner
+
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 查看系统信息
+        run: |
+          echo "=== 操作系统 ==="
+          cat /etc/os-release
+          
+          echo -e "\n=== CPU 信息 ==="
+          lscpu | grep "Model name"
+          
+          echo -e "\n=== 内存信息 ==="
+          free -h
+          
+          echo -e "\n=== 磁盘信息 ==="
+          df -h
+          
+          echo -e "\n=== 预装 Node 版本 ==="
+          node --version
+          npm --version
