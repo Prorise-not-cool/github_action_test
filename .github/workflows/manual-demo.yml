@@ -1,0 +1,27 @@
+name: manual-demo
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: '操作人昵称'
+        required: true
+        default: 'Guest'
+      confirm_deploy:
+        description: '确认立即部署？'
+        type: boolean
+        default: false
+
+jobs:
+  print-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 模拟部署逻辑
+        run: |
+          echo "👋 Hello, ${{ inputs.username }}!"
+          
+          # 注意这里对布尔值的判断逻辑
+          if [ "${{ inputs.confirm_deploy }}" == "true" ]; then
+            echo "✅ 收到指令，正在开始部署..."
+          else
+            echo "⏸️ 仅作为测试运行，跳过部署。"
+          fi
