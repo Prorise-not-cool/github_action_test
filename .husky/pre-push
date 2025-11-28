@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🏗️  [Pre-Push] 验证构建..."
+npm run build
+
+echo "✅ [Pre-Push] 检查通过"
