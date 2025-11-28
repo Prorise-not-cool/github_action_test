@@ -34,6 +34,7 @@ export default tseslint.config(
       ...eslintPluginReact.configs.recommended.rules,
       ...eslintPluginReactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off", // React 17+ 无需在作用域中引入 React
+      "no-console": "error",
     },
   },
   // 必须放在最后，用于关闭与 Prettier 冲突的规则
