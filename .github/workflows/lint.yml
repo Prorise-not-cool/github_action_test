@@ -10,12 +10,10 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest  # 使用 Ubuntu 虚拟机
-    
     steps:
       # 1. 把仓库代码克隆到虚拟机中
       - name: 检出代码
         uses: actions/checkout@v4
-      
       # 2. 安装 pnpm（必须在 setup-node 之前！）
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
