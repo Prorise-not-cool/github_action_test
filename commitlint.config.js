@@ -86,8 +86,10 @@ export default {
             { value: "types", name: "types:    🏷️  类型定义 | Type definition file changes", emoji: ":label:" },
         ],
 
+        
         // 是否使用 Emoji（会在 commit message 中显示）
         useEmoji: true,
+        useAI: true,
 
         // Scope 相关配置
         scopes: [], // 留空，自动从 rules['scope-enum'] 中读取

@@ -1,5 +1,6 @@
 name: Code Quality Check
 
+# 触发条件：当推送到 main/develop 分支，或创建 PR 到 main 时运行
 on:
   push:
     branches: [main, develop]
@@ -8,24 +9,30 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 使用 Ubuntu 虚拟机
     
     steps:
+      # 1. 把仓库代码克隆到虚拟机中
       - name: 检出代码
         uses: actions/checkout@v4
       
+      # 2. 安装 pnpm（必须在 setup-node 之前！）
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      # 3. 安装 Node.js 并配置依赖缓存
       - name: 设置 Node.js 环境
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-      - name: 启用 pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
+          cache: 'pnpm'  # 缓存 pnpm 依赖，加速后续运行
       
+      # 4. 安装项目依赖
       - name: 安装依赖
         run: pnpm install
       
+      # 5. 运行 ESLint 检查（如果有错误会导致工作流失败）
       - name: 运行 ESLint 检查
         run: pnpm run lint
