@@ -1,0 +1,27 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write       # 需要创建 Release 和 Tag
+  pull-requests: write  # 需要创建和更新 Release PR
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    
+    # 将输出暴露出来，供后续的构建/部署 Job 使用
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        with:
+          # 指定使用 Manifest 模式的配置文件
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

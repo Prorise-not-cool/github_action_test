@@ -161,6 +161,28 @@ jobs:
   - `needs: build-staging`：确保了串行执行顺序，测试环境挂了，生产环境根本不会开始
   - `environment: Production`：这是触发"审批弹窗"的开关。Runner 运行到此时，会向 GitHub 查询该环境是否有保护规则
   - `uses: ./.github/actions/build-and-verify`：引用本地创建的 composite action，通过 `with` 参数传入不同环境的配置
+  - `vars.VITE_API_URL`：为什么用 `vars` 而不是 `env`？
+    
+    **`vars` vs `env` 的区别**：
+    
+    | 上下文 | 用途 | 数据来源 | 示例 |
+    |:---|:---|:---|:---|
+    | **`vars`** | 访问 GitHub 仓库/组织/环境级别的**变量**（非敏感） | Settings > Variables 或 Settings > Environments > Variables | `${{ vars.VITE_API_URL }}` |
+    | **`env`** | 访问 workflow 中定义的**环境变量**或系统环境变量 | workflow 文件中的 `env:` 关键字，或系统环境变量 | `${{ env.NODE_VERSION }}` |
+    | **`secrets`** | 访问 GitHub 仓库/组织/环境级别的**密钥**（敏感） | Settings > Secrets 或 Settings > Environments > Secrets | `${{ secrets.API_KEY }}` |
+    
+    **在本例中的选择**：
+    - 我们在 GitHub 的 **Environments**（Staging/Production）中设置了 `VITE_API_URL` 变量
+    - 这些变量存储在 GitHub 的配置中，不是 workflow 文件中的 `env:`
+    - 因此必须使用 `vars.VITE_API_URL` 来访问
+    
+    **如果改用 `env` 的方式**（不推荐，因为无法区分环境）：
+    ```yaml
+    env:
+      VITE_API_URL: 'https://staging-api.example.com'  # 硬编码，无法区分环境
+    steps:
+      - run: echo ${{ env.VITE_API_URL }}
+    ```
 
 **第四阶段：执行与验证**
 
