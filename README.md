@@ -69,11 +69,15 @@ inputs:
     description: '验证步骤的提示消息'
     required: false
     default: '正在检查构建产物...'
+  vite_api_url:
+    description: 'Vite API URL 环境变量值'
+    required: true
 
 runs:
   using: 'composite'
   steps:
     # 注意：checkout 步骤应在工作流中完成，以便能够找到本 action 文件
+    # 注意：vars 上下文在 composite action 中不可用，需要通过 input 参数传递
     - uses: actions/setup-node@v4
       with:
         node-version: 18
@@ -86,7 +90,7 @@ runs:
       shell: bash
       run: npm run build
       env:
-        VITE_API_URL: ${{ vars.VITE_API_URL }}
+        VITE_API_URL: ${{ inputs.vite_api_url }}
 
     - name: Verify Output
       shell: bash
@@ -99,7 +103,10 @@ runs:
 
 现在创建工作流文件，使用上面创建的 composite action。
 
-**重要提示**：使用本地 composite action（`./.github/actions/...`）时，必须先执行 `actions/checkout@v4`，否则 GitHub Actions 无法找到 action.yml 文件。
+**重要提示**：
+
+- 使用本地 composite action（`./.github/actions/...`）时，必须先执行 `actions/checkout@v4`，否则 GitHub Actions 无法找到 action.yml 文件
+- `vars` 上下文在 composite action 中不可用，需要通过 `inputs` 参数传递环境变量值
 
 **文件路径**：`.github/workflows/cd-pipeline.yml`
 
@@ -124,6 +131,7 @@ jobs:
         with:
           expected_domain: 'staging-api.example.com'
           verify_message: '正在检查构建产物...'
+          vite_api_url: ${{ vars.VITE_API_URL }}
 
   # 阶段 2: 构建并部署到 Production
   build-production:
@@ -139,6 +147,7 @@ jobs:
         with:
           expected_domain: 'prod-api.example.com'
           verify_message: '生产环境构建完成！'
+          vite_api_url: ${{ vars.VITE_API_URL }}
 ```
 
 **核心配置解析：**

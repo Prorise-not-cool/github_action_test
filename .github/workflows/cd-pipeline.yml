@@ -18,6 +18,7 @@ jobs:
         with:
           expected_domain: "staging-api.example.com"
           verify_message: "正在检查构建产物..."
+          vite_api_url: ${{ vars.VITE_API_URL }}
 
   # 阶段 2: 构建并部署到 Production
   build-production:
@@ -33,3 +34,4 @@ jobs:
         with:
           expected_domain: "prod-api.example.com"
           verify_message: "生产环境构建完成！"
+          vite_api_url: ${{ vars.VITE_API_URL }}

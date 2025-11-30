@@ -9,6 +9,9 @@ inputs:
     description: '验证步骤的提示消息'
     required: false
     default: '正在检查构建产物...'
+  vite_api_url:
+    description: 'Vite API URL 环境变量值'
+    required: true
 
 runs:
   using: 'composite'
@@ -26,7 +29,7 @@ runs:
       shell: bash
       run: npm run build
       env:
-        VITE_API_URL: ${{ vars.VITE_API_URL }}
+        VITE_API_URL: ${{ inputs.vite_api_url }}
     
     - name: Verify Output
       shell: bash
