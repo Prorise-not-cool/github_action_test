@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Staging  # 核心：绑定 Staging 环境，自动读取对应变量
     steps:
+      # 必须先 checkout 代码，才能使用本地的 composite action
+      - uses: actions/checkout@v4
+      
       - name: Build and Verify
         uses: ./.github/actions/build-and-verify
         with:
@@ -22,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production # 核心：绑定 Production 环境（将触发人工审批）
     steps:
+      # 必须先 checkout 代码，才能使用本地的 composite action
+      - uses: actions/checkout@v4
+      
       - name: Build and Verify
         uses: ./.github/actions/build-and-verify
         with:

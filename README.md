@@ -73,8 +73,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v4
-
+    # 注意：checkout 步骤应在工作流中完成，以便能够找到本 action 文件
     - uses: actions/setup-node@v4
       with:
         node-version: 18
@@ -100,6 +99,8 @@ runs:
 
 现在创建工作流文件，使用上面创建的 composite action。
 
+**重要提示**：使用本地 composite action（`./.github/actions/...`）时，必须先执行 `actions/checkout@v4`，否则 GitHub Actions 无法找到 action.yml 文件。
+
 **文件路径**：`.github/workflows/cd-pipeline.yml`
 
 ```yaml
@@ -115,6 +116,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Staging # 核心：绑定 Staging 环境，自动读取对应变量
     steps:
+      # 必须先 checkout 代码，才能使用本地的 composite action
+      - uses: actions/checkout@v4
+
       - name: Build and Verify
         uses: ./.github/actions/build-and-verify
         with:
@@ -127,6 +131,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production # 核心：绑定 Production 环境（将触发人工审批）
     steps:
+      # 必须先 checkout 代码，才能使用本地的 composite action
+      - uses: actions/checkout@v4
+
       - name: Build and Verify
         uses: ./.github/actions/build-and-verify
         with:
