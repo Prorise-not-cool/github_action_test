@@ -1,0 +1,29 @@
+name: CD Pipeline Demo
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  # 阶段 1: 构建并部署到 Staging
+  build-staging:
+    runs-on: ubuntu-latest
+    environment: Staging  # 核心：绑定 Staging 环境，自动读取对应变量
+    steps:
+      - name: Build and Verify
+        uses: ./.github/actions/build-and-verify
+        with:
+          expected_domain: "staging-api.example.com"
+          verify_message: "正在检查构建产物..."
+
+  # 阶段 2: 构建并部署到 Production
+  build-production:
+    needs: build-staging  # 必须等 Staging 成功
+    runs-on: ubuntu-latest
+    environment: Production # 核心：绑定 Production 环境（将触发人工审批）
+    steps:
+      - name: Build and Verify
+        uses: ./.github/actions/build-and-verify
+        with:
+          expected_domain: "prod-api.example.com"
+          verify_message: "生产环境构建完成！"

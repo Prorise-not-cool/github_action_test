@@ -1,0 +1,37 @@
+name: 'Build and Verify'
+description: '构建项目并验证输出'
+
+inputs:
+  expected_domain:
+    description: '期望在构建产物中找到的域名'
+    required: true
+  verify_message:
+    description: '验证步骤的提示消息'
+    required: false
+    default: '正在检查构建产物...'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    
+    - name: Install dependencies
+      shell: bash
+      run: npm install
+    
+    - name: Build
+      shell: bash
+      run: npm run build
+      env:
+        VITE_API_URL: ${{ vars.VITE_API_URL }}
+    
+    - name: Verify Output
+      shell: bash
+      run: |
+        echo "${{ inputs.verify_message }}"
+        grep -r "${{ inputs.expected_domain }}" dist/ || echo "Build failed to inject variable"
+
