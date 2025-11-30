@@ -1,0 +1,29 @@
+name: Code Quality Check
+
+# 触发条件：当推送到 main/develop 分支，或创建 PR 到 main 时运行
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+    # 代码质量检查任务
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            # 检出代码到工作区
+            - name: 检出代码
+              uses: actions/checkout@v4
+
+            # 使用自定义 action 准备 Node.js 环境和安装依赖
+            # 引用方式：使用相对路径 ./ 指向仓库根目录下的 .github/actions/setup-node-env
+            - name: 准备环境
+              uses: ./.github/actions/setup-node-env
+              with:
+                  node-version: "18"
+            
+            # 运行 lint 检查
+            - name: 运行代码检查
+              run: pnpm run lint
+            
