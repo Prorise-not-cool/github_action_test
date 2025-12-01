@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Prorise-cool/github_action_test/compare/v1.0.0...v1.1.0) (2025-12-01)
+
+
+### Features
+
+* :sparkles: add state to track button click count ([9257570](https://github.com/Prorise-cool/github_action_test/commit/9257570b1e35f9436c6fd7ede37136815b34bc64))
+
 ## 1.0.0 (2025-11-30)
 
 
