@@ -56,11 +56,11 @@ jobs:
             type=raw,value=latest
             
             # 3. 生产层：精确版本 (生产环境用) - 仅在 release_created=true 时启用
-            type=raw,value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created }}
+            type=raw,value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created == 'true' }}
             
             # 4. (可选) 语义化次版本 v1.2 - 仅在 release_created=true 时启用
             # 如果 tag_name 是 v1.2.3，此规则会自动提取 v1.2
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created == 'true' }}
 
       - name: 🛠️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
