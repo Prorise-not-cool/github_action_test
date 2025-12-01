@@ -23,7 +23,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: my-username/my-app
+          images: prorise123/git-hooks-demo
           # 标签规则配置：
           tags: |
             # 规则1：如果是 tag 事件 (v1.2.3)，生成 v1.2.3 和 latest
