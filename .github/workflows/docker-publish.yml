@@ -1,0 +1,61 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'  # 监听以 v 开头的 tag（如 v1.0.0, v1.0.1）
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: my-username/my-app
+          # 标签规则配置：
+          tags: |
+            # 规则1：如果是 tag 事件 (v1.2.3)，生成 v1.2.3 和 latest
+            type=semver,pattern={{version}}
+            # 规则2：如果是 push 事件，生成 branch-name (main)
+            type=ref,event=branch
+            # 规则3：始终生成短 SHA (sha-xxxxxx)
+            type=sha
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile  # 如果 Dockerfile 不在根目录，需要指定路径
+          push: true
+          # 引用 meta 步骤生成的 tags 和 labels
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # 开启多架构构建（可选）
+          platforms: linux/amd64,linux/arm64
+          # 利用 GitHub Actions 缓存加速构建
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
