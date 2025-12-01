@@ -1,0 +1,33 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]  # 关键：仅在发布 Release 后触发
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # 用于 OIDC 身份验证（如果需要）
+
+    steps:
+        - name: Checkout Code
+          uses: actions/checkout@v4
+  
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20'
+            # 关键：告诉 Action 我们要与 npmjs.org 交互
+            # 这会自动配置 .npmrc 文件
+            registry-url: 'https://registry.npmjs.org'
+  
+        - name: Install Dependencies
+          run: npm ci
+  
+        - name: Publish to NPM
+          # 这里的 NODE_AUTH_TOKEN 环境变量会被 .npmrc 读取
+          env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          run: npm publish --access public
