@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Prorise-cool/github_action_test/compare/v1.2.0...v1.3.0) (2025-12-01)
+
+
+### Features
+
+* add npm publish in release-please ([dd3ea96](https://github.com/Prorise-cool/github_action_test/commit/dd3ea96e1c31c88a21d5e51588aa104562f91542))
+
 ## [1.2.0](https://github.com/Prorise-cool/github_action_test/compare/v1.1.0...v1.2.0) (2025-12-01)
 
 
