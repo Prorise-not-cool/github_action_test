@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/Prorise-cool/github_action_test/compare/v1.1.0...v1.2.0) (2025-12-01)
+
+
+### Features
+
+* updated workflow ([608c7ff](https://github.com/Prorise-cool/github_action_test/commit/608c7ff8be1fac2f6658e24185dc4312b146cd45))
+
 ## [1.1.0](https://github.com/Prorise-cool/github_action_test/compare/v1.0.0...v1.1.0) (2025-12-01)
 
 
