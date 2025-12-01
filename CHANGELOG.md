@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/Prorise-cool/github_action_test/compare/v1.3.0...v1.4.0) (2025-12-01)
+
+
+### Features
+
+* add pnpm install in workflow ([6f9d362](https://github.com/Prorise-cool/github_action_test/commit/6f9d3625e9024515f28d33aaac607767ee102577))
+
 ## [1.3.0](https://github.com/Prorise-cool/github_action_test/compare/v1.2.0...v1.3.0) (2025-12-01)
 
 
