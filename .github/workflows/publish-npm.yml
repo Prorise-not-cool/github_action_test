@@ -1,8 +1,9 @@
 name: Publish to NPM
 
 on:
-  release:
-    types: [published]  # 关键：仅在发布 Release 后触发
+  push:
+    tags:
+      - 'v*'  # 监听以 v 开头的 tag（如 v1.0.0, v1.0.1）
 
 jobs:
   publish:

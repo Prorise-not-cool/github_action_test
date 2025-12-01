@@ -27,6 +27,3 @@ jobs:
           # 指定使用 Manifest 模式的配置文件
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          # GITHUB_TOKEN 会自动提供，无需显式指定
-
-          
