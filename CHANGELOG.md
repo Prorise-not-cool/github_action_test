@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/Prorise-cool/github_action_test/compare/v1.6.0...v1.7.0) (2025-12-01)
+
+
+### Features
+
+* add docker auto ([33d31bc](https://github.com/Prorise-cool/github_action_test/commit/33d31bc9e66de951632d2ce6152fd2f083fd37d4))
+* add test content ([3e001bb](https://github.com/Prorise-cool/github_action_test/commit/3e001bb88ae5597133a159c7abf3c143e5f3984e))
+
 ## [1.6.0](https://github.com/Prorise-cool/github_action_test/compare/v1.5.0...v1.6.0) (2025-12-01)
 
 
