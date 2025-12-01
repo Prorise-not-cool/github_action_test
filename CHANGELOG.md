@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.0](https://github.com/Prorise-cool/github_action_test/compare/v1.5.0...v1.6.0) (2025-12-01)
+
+
+### Features
+
+* delete release package and add docker-publish.yml ([6150af9](https://github.com/Prorise-cool/github_action_test/commit/6150af9f62f822fea4df9a1dcbe9a551e99484ba))
+* new docker-published.yml ([617d46c](https://github.com/Prorise-cool/github_action_test/commit/617d46c877a1c5f326af6c0a6d15179b7b0ad769))
+* refine docker-publish.yml ([8c64e8a](https://github.com/Prorise-cool/github_action_test/commit/8c64e8a81efbe64dac8dcf11c92dd240cda5d7aa))
+
 ## [1.5.0](https://github.com/Prorise-cool/github_action_test/compare/v1.4.0...v1.5.0) (2025-12-01)
 
 
