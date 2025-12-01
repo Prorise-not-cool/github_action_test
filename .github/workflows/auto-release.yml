@@ -8,20 +8,18 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  # 如果推送到 GitHub Container Registry (GHCR)，需解开下行注释
-  # packages: write
 
 jobs:
   # ====================================================
-  # Job 1: 核心编排者 (Release Please)
+  # Job 1: 版本控制中心 (Release Please)
   # ====================================================
   release-please:
     runs-on: ubuntu-latest
-    # 将关键结果输出给下游 Job
     outputs:
+      # 输出布尔值：true 代表这是一次正式发版，false 代表只是普通代码合并
       release_created: ${{ steps.release.outputs.release_created }}
+      # 输出版本号：例如 v1.2.3
       tag_name: ${{ steps.release.outputs.tag_name }}
-    
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
@@ -29,64 +27,59 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-
   # ====================================================
-  # Job 3: Docker 发布 (下游任务 B)
+  # Job 2: 全场景 Docker 构建
   # ====================================================
   publish-docker:
-    name: 🐳 Publish to Docker Hub
     needs: release-please
-    # 只有 Release 真正创建时才运行
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
     
     steps:
-      # 1. 检出代码
       - name: 📥 Checkout 代码
         uses: actions/checkout@v4
-        with:
-          # 关键：显式检出 Release Please 生成的 Tag
-          ref: ${{ needs.release-please.outputs.tag_name }}
+        # 默认检出 main 分支最新代码，这符合 latest 的定义
 
-      # 2. 生成元数据
-      - name: 🏷️ 生成 Docker 元数据
+      - name: 🏷️ 配置动态标签策略
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # ⚠️ 替换：你的 Docker Hub 用户名/仓库名
           images: prorise123/git-hooks-demo
+          # 核心配置：使用 enable 属性控制特定标签是否生成
           tags: |
-            # 强制使用上游传递的版本号 (如 v1.0.0)
-            type=raw,value=${{ needs.release-please.outputs.tag_name }}
-            # 始终更新 latest 标签
+            # 1. 基础层：Git SHA (调试用) - 每次必打
+            type=sha,format=long
+            
+            # 2. 基础层：Latest (测试环境用) - 每次必打
             type=raw,value=latest
+            
+            # 3. 生产层：精确版本 (生产环境用) - 仅在 release_created=true 时启用
+            type=raw,value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created }}
+            
+            # 4. (可选) 语义化次版本 v1.2 - 仅在 release_created=true 时启用
+            # 如果 tag_name 是 v1.2.3，此规则会自动提取 v1.2
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }},enable=${{ needs.release-please.outputs.release_created }}
 
-      # 3. 设置 Buildx 构建环境
       - name: 🛠️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 4. 登录 Docker Hub
       - name: 🔐 登录 Docker Hub
         uses: docker/login-action@v3
         with:
-          # 建议使用 Access Token 而不是密码
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # 5. 构建并推送
-      - name: 🚀 构建并推送镜像
+      - name: 🚀 构建并推送
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          # 使用步骤 2 定义的强制标签
+          # 自动应用上述 step 生成的所有标签
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 仅构建 AMD64 架构以保证速度 (如需多架构可改为 linux/amd64,linux/arm64)
           platforms: linux/amd64
-          # 利用 GitHub Actions 缓存加速
           cache-from: type=gha
           cache-to: type=gha,mode=max
