@@ -55,11 +55,12 @@ jobs:
 登录 Docker Hub 时，**企业级场景必须使用 Access Token 而不是账户密码**。Token 提供了更好的安全性和可管理性，可以设置权限范围和过期时间，并且可以随时撤销而不影响主账户。在 Docker Hub 的 Account Settings → Security 中生成 Access Token，将 Token 存入 GitHub Secrets 作为 `DOCKER_TOKEN`。
 
 ```yaml
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      # 如果不需要 ARM 架构支持，可以省略 QEMU 设置
+      # 如果需要多架构构建，取消下面的注释
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -81,8 +82,9 @@ jobs:
           # 引用 meta 步骤生成的 tags 和 labels
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 开启多架构构建（可选）
-          platforms: linux/amd64,linux/arm64
+          # 暂时只构建 amd64 架构，避免 QEMU ARM 模拟问题
+          # 如果需要 ARM 支持，可以改为: platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           # 利用 GitHub Actions 缓存加速构建
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -96,15 +98,21 @@ jobs:
 
 第一个坑是触发机制的选择。如果使用 Release Please，直接监听 `release: types: [published]` 可能不会触发，原因与 NPM 发布相同。最佳实践是监听 `push: tags`，当 Release Please 创建 tag 时自动触发构建。如果需要在 Release PR 合并时立即构建，也可以将 Docker 构建作为 Release Please workflow 的一部分，使用 job outputs 和条件判断。
 
+另一个触发机制的坑是同时监听 `push: branches: [main]` 和 `push: tags` 可能导致重复构建。当 Release Please 创建 tag 时，可能会同时触发 push 到 main 分支的事件，导致同一个构建运行两次。如果只需要生产镜像，建议只监听 `push: tags`；如果需要同时构建开发和生产镜像，需要添加条件判断来避免重复构建。
+
 第二个坑是 Dockerfile 路径问题。如果 Dockerfile 不在项目根目录，必须在 `build-push-action` 中指定 `file` 参数。例如，如果 Dockerfile 在 `docker/Dockerfile`，需要设置 `file: ./docker/Dockerfile`，同时 `context` 仍然应该是 `.`（项目根目录），这样构建上下文才能包含所有需要的文件。
 
-第三个坑是多架构构建的性能问题。构建多架构镜像（如 `linux/amd64,linux/arm64`）会显著增加构建时间，因为需要为每个架构分别构建。如果项目暂时不需要支持 ARM 架构，可以先只构建 `linux/amd64`，后续再扩展。另外，QEMU 模拟 ARM 架构构建可能比原生构建慢 3-5 倍，这是正常现象。
+第三个坑是多架构构建的性能和兼容性问题。构建多架构镜像（如 `linux/amd64,linux/arm64`）会显著增加构建时间，因为需要为每个架构分别构建。如果项目暂时不需要支持 ARM 架构，可以先只构建 `linux/amd64`，后续再扩展。另外，QEMU 模拟 ARM 架构构建可能比原生构建慢 3-5 倍，这是正常现象。
+
+更严重的问题是 QEMU 在模拟 ARM64 架构时可能遇到 "qemu: uncaught target signal 4 (Illegal instruction)" 错误，导致构建卡死或失败。这通常是因为某些原生模块或构建工具在 QEMU 模拟环境下不兼容。解决方法：如果不需要 ARM 支持，移除 QEMU 设置并将 `platforms` 设置为 `linux/amd64`；如果需要 ARM 支持，需要确保所有依赖都支持 ARM 架构，或者使用原生 ARM 构建环境（如 GitHub Actions 的 ARM runner）。
 
 第四个坑是缓存配置的误解。`cache-from: type=gha` 和 `cache-to: type=gha,mode=max` 使用的是 GitHub Actions 缓存，而不是 Docker 层缓存。虽然可以加速构建，但首次构建或缓存失效时仍然需要完整构建。对于大型项目，建议在 Dockerfile 中合理使用多阶段构建和层缓存策略，将变化频率低的依赖安装步骤放在前面。
 
 第五个坑是镜像名称格式错误。`docker/metadata-action` 的 `images` 字段必须是完整的 Docker Hub 仓库路径，格式为 `username/repository-name`。如果只写 `my-app`，会导致推送失败。另外，确保 Docker Hub 用户名和仓库名都是小写，Docker Hub 不允许大写字母。
 
 第六个坑是认证方式的选择。**企业级场景必须使用 Access Token 而不是个人账户密码**。原因有三：第一，企业通常使用组织账户或服务账户，而不是个人账户；第二，Token 可以设置权限范围和过期时间，安全性更高；第三，Token 可以随时撤销，即使泄露也不会影响主账户。配置方法：在 Docker Hub 的 Account Settings → Security 中生成 Access Token，将 Token 存入 GitHub Secrets 作为 `DOCKER_TOKEN`，用户名作为 `DOCKER_USERNAME`（通常是组织账户名）。在 workflow 中使用 `password: ${{ secrets.DOCKER_TOKEN }}` 而不是 `DOCKER_PASSWORD`。
+
+第七个坑是 Docker Hub 仓库不存在的问题。如果遇到 "push access denied, repository does not exist" 错误，通常是因为 Docker Hub 仓库还没有创建。**Docker Hub 仓库需要手动创建**，不能通过 API 自动创建。创建步骤：登录 Docker Hub → 点击 "Repositories" → "Create Repository" → 填写仓库名（必须小写）→ 选择 Public 或 Private → 创建。创建完成后，确保 workflow 中的 `images` 字段使用完整的仓库路径格式 `username/repository-name`。
 
 ---
 
