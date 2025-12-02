@@ -1,0 +1,36 @@
+name: 🐛 Bug Report
+description: 创建一个 Bug 报告以帮助我们改进
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请确保已搜索现有 Issue，避免重复。
+  
+  - type: input
+    id: version
+    attributes:
+      label: 受影响的版本
+      placeholder: x.x.x
+    validations:
+      required: true  # 必填校验
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重程度
+      options:
+        - 🔴 生产环境崩溃 (Critical)
+        - 🟡 功能受损 (Major)
+        - 🟢 体验问题 (Minor)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请详细描述如何重现该 Bug
+    validations:
+      required: true
