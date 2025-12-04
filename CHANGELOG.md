@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.8.0](https://github.com/Prorise-cool/github_action_test/compare/v1.7.0...v1.8.0) (2025-12-04)
+
+
+### Features
+
+* add &lt;p&gt; hello world ([403cbdb](https://github.com/Prorise-cool/github_action_test/commit/403cbdb15658f7a56829b8c0e84dd194bda248ed))
+* add aws credentials config ([9bbe4ea](https://github.com/Prorise-cool/github_action_test/commit/9bbe4eabb4c52ec0ed33bdb7fd2183f9cde4ff96))
+* add aws credentials config contain secret ([0eeb269](https://github.com/Prorise-cool/github_action_test/commit/0eeb2690f2ce04cd0cda9ede4e63fe1813b7540c))
+* add githubSecret credentials config ([267939b](https://github.com/Prorise-cool/github_action_test/commit/267939b616c5479cbdb2ef0b3ada514b59a73095))
+* add login module ([a6b681f](https://github.com/Prorise-cool/github_action_test/commit/a6b681f42ef6403ac23116c4f7a5b5afffe86362))
+
+
+### Documentation
+
+* add readme.md ([1df8a4e](https://github.com/Prorise-cool/github_action_test/commit/1df8a4eb9c8ff5d55ce3f898e427a1e326b5cf8e))
+
 ## [1.7.0](https://github.com/Prorise-cool/github_action_test/compare/v1.6.0...v1.7.0) (2025-12-01)
 
 
