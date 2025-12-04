@@ -77,7 +77,6 @@ pnpm dev
 - **Version: 1.0.0**（来自 `src/version.ts`）
 - **Hello World**
 
-这就是本项目最简单的 Hello World 示例，也是你后续扩展业务逻辑的起点。
 
 ## License
 
