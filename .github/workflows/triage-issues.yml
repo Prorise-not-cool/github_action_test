@@ -1,0 +1,38 @@
+name: Issue 自动化治理
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 识别并标记新手任务
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            
+            // 关键词检测：如果正文包含 "新手任务" 或 "good first issue"
+            if (body.includes('新手任务') || body.includes('good first issue')) {
+              // 1. 添加标签
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['good first issue', 'help wanted']
+              });
+              
+              // 2. 发送鼓励评论
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `👋 感谢创建这个新手任务！\n\n这是一个非常适合新贡献者上手的机会。请查看我们的 [贡献指南](CONTRIBUTING.md) 开始你的第一次提交。如果你需要帮助，请随时 @maintainer。`
+              });
+            }
